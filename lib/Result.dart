@@ -14,7 +14,7 @@ class ResultPage extends StatefulWidget {
   const ResultPage(
     this.dryres,
     this.wetres,
-    this.dem,
+    this.dem, 
     this.pep,
     this.mondry,
     this.monwet,

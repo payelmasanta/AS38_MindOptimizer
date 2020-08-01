@@ -26,7 +26,7 @@ class ConnectVendorsState extends State<ConnectVendors> {
                   ),
                 ),
               ],
-            ),
+            ), 
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[

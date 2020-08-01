@@ -44,7 +44,37 @@ class CalculationsState extends State<Calculations> {
 
 
 
-  //FetchJSON
+  FetchJSON() async {
+    var Response = await http.get(
+      "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/a82a39acd54e00d8c3396f3c4a559c43db96b2d3/kuchbhi.json",
+      headers: {"Accept": "application/json"},
+    );
+    //var kar = "Mysuru";
+    if (Response.statusCode == 200) {
+      String responseBody = Response.body;
+      var responseJSON = json.decode(responseBody);
+      place = "$placeName";
+
+      mondry = responseJSON["$place"]["month_dry"];
+      raindry = responseJSON["$place"]["rain_dry"];
+      monwet = responseJSON["$place"]["month_wet"];
+      rainwet = responseJSON["$place"]["rain_wet"];
+
+      print(mondry);
+      print(raindry);
+      print(monwet);
+      print(rainwet);
+      isData = true;
+      setState(() {
+        print('UI Updated');
+      });
+    } else {
+      print('Something went wrong. \nResponse Code : ${Response.statusCode}');
+    }
+  }
+  
+  
+  
 
   @override
   Widget build(BuildContext context) {

@@ -38,13 +38,31 @@ class CalculationsState extends State<Calculations> {
     const Item('Brick Pavement'),
   ];
 
-  //GET LOCATION
-
-
-
-
-
-  FetchJSON() async {
+  //GET LOCATIONFuture getCurrentLocation() async {
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+    if (isLocationEnabled) {
+      Position position = await Geolocator()
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      debugPrint('location: ${position.latitude}');
+      final coordinates =
+          new Coordinates(position.latitude, position.longitude);
+      var addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var first = addresses.first;
+      print("${first.featureName} : ${first.addressLine}");
+      setState(() {
+        locationMessage = "${position.latitude}, ${position.longitude}";
+        placeName = " ${first.subAdminArea}";
+        print(placeName);
+      });
+      return placeName;
+    } else {
+      showDialog(
+          context: context, builder: (BuildContext context) => errorDialog);
+      
+    }
+  }
+ FetchJSON() async {
     var Response = await http.get(
       "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/a82a39acd54e00d8c3396f3c4a559c43db96b2d3/kuchbhi.json",
       headers: {"Accept": "application/json"},

@@ -2,6 +2,7 @@ import 'package:rwh_assistant/home_page.dart';
 import 'package:rwh_assistant/start_building.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class ResultPage extends StatefulWidget {
   final String dryres, wetres;
@@ -28,6 +29,60 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+  List<charts.Series> seriesList;
+  List<charts.Series<Chartseries, String>> create() {
+    final deman = widget.dem;
+    final pepp = widget.pep;
+    final demm = deman * pepp * 30;
+    final chartrainwet = [
+      Chartseries(
+        demand: demm,
+        resultdry: double.parse(widget.dryres),
+        resultwet: double.parse(widget.wetres),
+        litres: "Collected/Demand",
+      ),
+    ];
+
+    final chartdem = [
+      Chartseries(
+        demand: demm,
+        resultdry: double.parse(widget.dryres),
+        resultwet: double.parse(widget.wetres),
+        litres: "Collected/Demand",
+      ),
+    ];
+    return [
+      charts.Series<Chartseries, String>(
+        id: 'RsultWet',
+        domainFn: (Chartseries chart, _) => chart.litres,
+        measureFn: (Chartseries chart, _) => chart.resultwet,
+        data: chartrainwet,
+      ),
+      charts.Series<Chartseries, String>(
+          id: 'RsultWet',
+          domainFn: (Chartseries chart, _) => chart.litres,
+          measureFn: (Chartseries chart, _) => chart.demand,
+          data: chartdem,
+          fillColorFn: (Chartseries chart, _) {
+            return charts.MaterialPalette.green.shadeDefault;
+          })
+    ];
+  }
+
+  barChart() {
+    return charts.BarChart(
+      seriesList,
+      animate: true,
+      vertical: true,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    seriesList = create();
+  }
+
   //final double wrain = City().wet_rain;
 
   @override
@@ -56,11 +111,8 @@ class _ResultPageState extends State<ResultPage> {
                     margin: EdgeInsets.only(top: 10),
                     padding: const EdgeInsets.only(left: 40.0, right: 8.0),
                     child: Text(
-                      'SUMMARY',
-                      style: TextStyle(
-                          fontFamily: 'Oswald',
-                          letterSpacing: 2.5,
-                          fontWeight: FontWeight.bold),
+                      'Summary',
+                      style: TextStyle(fontFamily: 'Oswald', fontSize: 23),
                     )),
               ],
             ),
@@ -108,7 +160,7 @@ class _ResultPageState extends State<ResultPage> {
                     children: <Widget>[
                       Text(""),
                       Text(
-                        "Summary",
+                        "Rainfall",
                         style: TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold),
                       ),
@@ -254,11 +306,18 @@ class _ResultPageState extends State<ResultPage> {
                           fontFamily: 'Open Sans'),
                     ),
                     Text(
-                      "Since there are $peop people and the water demand per person is $dema litres per day, the total water demand is $totdem litres per day, which equals to about $totald litres per month.",
+                      "Since there are $peop people and the water demand per person is $dema litres per day, the total water demand is $totdem litres per day, which equals to about $totald litres per month.\n\n The below graph shows the collected water vs total demand.",
                       style: TextStyle(fontFamily: 'Open Sans'),
                     ),
                   ],
                 ),
+              ),
+              Text(''),
+              Container(
+                height: 300,
+                width: 300,
+                padding: EdgeInsets.all(20),
+                child: barChart(),
               ),
               Text(''),
               Text(''),
@@ -358,4 +417,18 @@ class _ResultPageState extends State<ResultPage> {
       ),
     );
   }
+}
+
+class Chartseries {
+  final String litres;
+  final double demand, resultdry, resultwet;
+  final charts.Color barColor;
+
+  Chartseries({
+    @required this.demand,
+    @required this.resultdry,
+    @required this.resultwet,
+    @required this.litres,
+    this.barColor,
+  });
 }

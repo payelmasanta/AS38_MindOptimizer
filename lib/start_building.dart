@@ -31,7 +31,7 @@ class _StepperClassState extends State<StepperClass> {
               children: <Widget>[
                 Container(
                   //margin: EdgeInsets.only(left: 83, right: 0),
-                  child: FlatButton(
+                  child: FlatButton( 
                     color: Colors.blue[900],
                     child: Image.asset(
                       'assets/images/logo1.jpeg',

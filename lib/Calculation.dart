@@ -38,7 +38,8 @@ class CalculationsState extends State<Calculations> {
     const Item('Brick Pavement'),
   ];
 
-  //GET LOCATIONFuture getCurrentLocation() async {
+  //GET LOCATION
+  Future getCurrentLocation() async {
     bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
     if (isLocationEnabled) {
       Position position = await Geolocator()

@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:rwh_assistant/Result.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'home_page.dart';
+
+class Item {
+  const Item(this.name);
+  final String name;
+}
 
 class Calculations extends StatefulWidget {
   @override
@@ -7,9 +18,34 @@ class Calculations extends StatefulWidget {
 }
 
 class CalculationsState extends State<Calculations> {
-  double roofsize, demand;
+  String mondry, monwet;
+  double raindry, rainwet;
+  var use = new List();
+  bool isData = false;
+  String locationMessage = "", place;
+  String placeName = '';
+  double demand;
+  double result_dry, result_wet;
   int people;
+  Item selectedRegion, selectedCatchment;
+  double catchValue, roofsize; //catchValue is the runn-off factor
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  List<Item> catchment = <Item>[
+    const Item('Tiles'),
+    const Item('Corrugated Metal Sheets'),
+    const Item('Concrete'),
+    const Item('Brick Pavement'),
+  ];
+
+  //GET LOCATION
+
+
+
+
+
+  //FetchJSON
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,8 +60,11 @@ class CalculationsState extends State<Calculations> {
                     margin: EdgeInsets.only(top: 10),
                     padding: const EdgeInsets.only(left: 40.0, right: 8.0),
                     child: Text(
-                      'Calculate Rainfall',
-                      style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
+                      'CALCULATE RAINFALL',
+                      style: TextStyle(
+                          fontFamily: 'Oswald',
+                          letterSpacing: 1,
+                          fontWeight: FontWeight.bold),
                     )),
               ],
             ),
@@ -63,6 +102,28 @@ class CalculationsState extends State<Calculations> {
           child: Column(
             //crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      getCurrentLocation();
+                    },
+                    color: Colors.blue[300],
+                    child: Text(
+                      "Get Location",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.location_on),
+                  Text(placeName),
+                ],
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -151,6 +212,83 @@ class CalculationsState extends State<Calculations> {
                   Text(
                       "The minimum water demand according to the World Health Organization (WHO) is "
                       "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day."),
+                  Text(""),
+                  Text(''),
+                  Text(''),
+                  Container(
+                    //padding: EdgeInsets.only(left:10, right:0),
+                    child: Text(
+                      'Select Catchment Type:',
+                      style:
+                          TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    //padding: EdgeInsets.only(left:10, right:0),
+                    child: DropdownButton<Item>(
+                      hint: Text("Select Catchment Type"),
+                      value: selectedCatchment,
+                      onChanged: (Item Value) {
+                        setState(() {
+                          selectedCatchment = Value;
+                          if (selectedCatchment.name == "Tiles") {
+                            catchValue = 0.85;
+                            //print(catchValue);
+                          } else if (selectedCatchment.name ==
+                              "Corrugated Metal Sheets") {
+                            catchValue = 0.8;
+                            //print(catchValue);
+                          } else if (selectedCatchment.name == "Concrete") {
+                            catchValue = 0.7;
+                            //print(catchValue);
+                          } else {
+                            catchValue = 0.55;
+                            //print(catchValue);
+                          }
+                          FetchJSON();
+                        });
+                      },
+                      items: catchment.map((Item user) {
+                        return DropdownMenuItem<Item>(
+                          value: user,
+                          child: Row(
+                            children: <Widget>[
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                user.name,
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  //catchment end
+                  Text(""),
+                  Container(
+                    padding: EdgeInsets.only(right: 20, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        RaisedButton(
+                          padding: EdgeInsets.only(left: 0, right: 0),
+                          color: Colors.blue[300],
+                          child: Text(
+                            'Submit',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          onPressed: () {
+                            _formKey.currentState.save();
+                            submitit(roofsize, catchValue, raindry, rainwet);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -158,5 +296,69 @@ class CalculationsState extends State<Calculations> {
         ),
       ),
     );
+  }
+
+  Dialog errorDialog = Dialog(
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0)), //this right here
+    child: Container(
+      height: 200.0,
+      width: 300.0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(""),
+          Text(""),
+          Container(
+            padding: EdgeInsets.only(left: 20, right: 15),
+            child: Text(
+              'To continue, turn on device location.',
+              style: TextStyle(fontSize: 22, color: Colors.grey),
+            ),
+          ),
+          Text(""),
+          Container(
+              padding: EdgeInsets.only(left: 40, top: 40),
+              margin: EdgeInsets.only(bottom: 10, right: 1),
+              child: FlatButton(
+                onPressed: () {
+                  AppSettings.openLocationSettings();
+                },
+                child: Text(
+                  'Go to Location settings >>',
+                  style: TextStyle(color: Colors.blue, fontSize: 17.0),
+                ),
+              )),
+        ],
+      ),
+    ),
+  );
+
+  void submitit(double roofsize, catvalue, resrd, resrw) async {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      result_dry = (roofsize * catvalue) * resrd;
+      result_wet = (roofsize * catvalue) * resrw;
+      print(result_dry);
+      print(result_wet);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultPage(
+              result_dry.toString(),
+              result_wet.toString(),
+              demand,
+              people,
+              mondry,
+              monwet,
+              selectedCatchment.name.toString(),
+              raindry,
+              rainwet,
+              roofsize,
+              catchValue),
+        ),
+      );
+    }
   }
 }

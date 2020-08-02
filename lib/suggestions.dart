@@ -11,7 +11,7 @@ class _SuggestionsState extends State<Suggestions> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue[900],
+        backgroundColor: Colors.blue[900], 
         title: Stack(
           children: <Widget>[
             Row(

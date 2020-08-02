@@ -95,9 +95,11 @@ class LoginPageState extends State<LoginPage> {
                                     Text(""),
                                     Text(""),
                                     TextFormField(
+                                      style: TextStyle(color: Colors.white),
                                       keyboardType: TextInputType.emailAddress,
                                       validator: validateEmail,
                                       onSaved: (input) => email = input,
+                                      cursorColor: Colors.white,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
                                         contentPadding:
@@ -110,6 +112,8 @@ class LoginPageState extends State<LoginPage> {
                                     ),
                                     Text(""),
                                     TextFormField(
+                                      style: TextStyle(color: Colors.white),
+                                      cursorColor: Colors.white,
                                       obscureText: true,
                                       onSaved: (input) => password = input,
                                       validator: (input) {

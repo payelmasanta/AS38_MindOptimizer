@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:rwh_assistant/imagefromuser.dart';
+import 'package:rwh_assistant/maintenance.dart';
+import 'package:rwh_assistant/suggestions.dart';
 import './Calculation.dart';
 import './about_screen.dart';
 import './connect_vendors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import './login_page.dart';
 import './start_building.dart';
 //import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,8 +25,10 @@ class Constants {
 class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar( 
+      appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Stack(
           children: <Widget>[
@@ -33,7 +40,7 @@ class MyHomePageState extends State<MyHomePage> {
                   child: Image.asset(
                     'assets/images/logo1.jpeg',
                     fit: BoxFit.contain,
-                    height: 50,
+                    height: height * 0.07,
                   ),
                 ),
               ],
@@ -48,7 +55,8 @@ class MyHomePageState extends State<MyHomePage> {
                       'AQUASTORE',
                       style: TextStyle(
                           fontFamily: 'Oswald',
-                          letterSpacing: 2.5,
+                          fontSize: 25,
+                          letterSpacing: 1.5,
                           fontWeight: FontWeight.bold),
                     )),
               ],
@@ -89,7 +97,7 @@ class MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                height: 70,
+                height: height * 0.095,
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: RaisedButton(
@@ -110,7 +118,7 @@ class MyHomePageState extends State<MyHomePage> {
               ),
               //const SizedBox(width:100,),
               Container(
-                height: 70,
+                height: height * 0.095,
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: RaisedButton(
@@ -130,7 +138,7 @@ class MyHomePageState extends State<MyHomePage> {
               ),
               //const SizedBox( width:100,),
               Container(
-                height: 70,
+                height: height * 0.095,
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: RaisedButton(
@@ -149,6 +157,25 @@ class MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               Container(
+                height: height * 0.095,
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: RaisedButton(
+                  child: Text(
+                    'Verify Work',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImagePage(),
+                        ));
+                  },
+                  color: Colors.blue[100],
+                ),
+              ),
+              Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 30, horizontal: 0),
                 margin: EdgeInsets.only(left: 5, right: 5),
@@ -156,6 +183,70 @@ class MyHomePageState extends State<MyHomePage> {
                 child: Padding(
                   padding: const EdgeInsets.all(0),
                   child: Container(),
+                ),
+              ),
+              Container(
+                height: 900,
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 30, horizontal: 0),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: AssetImage(
+                      'assets/images/home1.png',
+                    ),
+                  ),
+                ),
+              ),
+              Text(""),
+              Text(""),
+              Container(
+                width: width * 0.9,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    //Text("    "),
+                    Column(
+                      //crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        RaisedButton(
+                          color: Colors.blue[900],
+                          child: Text(
+                            'Maintenance',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Maintenance()),
+                          ),
+                        ),
+                      ],
+                    ),
+                    //Text("         "),
+                    Column(
+                      //mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        RaisedButton(
+                          color: Colors.blue[900],
+                          child: Text(
+                            'Suggestions',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Suggestions(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -173,7 +264,31 @@ class MyHomePageState extends State<MyHomePage> {
             builder: (context) => AboutScreen(),
           ));
     } else if (choice == Constants.SignOut) {
-      //signnOut();
+      signnOut();
+    }
+  }
+
+  Future signnOut() async {
+    final FirebaseAuth _authh = FirebaseAuth.instance;
+    try {
+      await _authh.signOut();
+      final FirebaseUser userr = await FirebaseAuth.instance.currentUser();
+      if (userr == null) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            ));
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AboutScreen(),
+            ));
+      }
+    } catch (error) {
+      print(error.toString());
+      return null;
     }
   }
 }

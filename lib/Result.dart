@@ -3,6 +3,7 @@ import 'package:rwh_assistant/start_building.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'dart:math';
 
 class ResultPage extends StatefulWidget {
   final String dryres, wetres;
@@ -14,7 +15,7 @@ class ResultPage extends StatefulWidget {
   const ResultPage(
     this.dryres,
     this.wetres,
-    this.dem, 
+    this.dem,
     this.pep,
     this.mondry,
     this.monwet,
@@ -77,16 +78,44 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
+  List<charts.Series> chList;
+  static List<charts.Series<CatchChart, String>> createCa() {
+    final catchdata = [
+      CatchChart(type: 'Brick', value: 55),
+      CatchChart(type: 'Concrete', value: 70),
+      CatchChart(type: 'Metal sheets', value: 80),
+      CatchChart(type: 'Tiles', value: 85),
+    ];
+    return [
+      charts.Series<CatchChart, String>(
+        id: 'CatchValue',
+        domainFn: (CatchChart catchchart, _) => catchchart.type,
+        measureFn: (CatchChart catchchart, _) => catchchart.value,
+        data: catchdata,
+      )
+    ];
+  }
+
+  caChart() {
+    return charts.BarChart(
+      chList,
+      animate: true,
+      vertical: true,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     seriesList = create();
+    chList = createCa();
   }
 
   //final double wrain = City().wet_rain;
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     String vol1 = widget.dryres;
     String vol2 = widget.wetres;
     double dema = widget.dem;
@@ -257,6 +286,13 @@ class _ResultPageState extends State<ResultPage> {
                 ),
               ),
               Text(''),
+              Container(
+                height: 300,
+                width: width * 1,
+                padding: EdgeInsets.all(20),
+                child: caChart(),
+              ),
+              Text(''),
               Text(''),
               Container(
                 padding: EdgeInsets.all(6),
@@ -315,7 +351,7 @@ class _ResultPageState extends State<ResultPage> {
               Text(''),
               Container(
                 height: 300,
-                width: 300,
+                width: width * 0.8,
                 padding: EdgeInsets.all(20),
                 child: barChart(),
               ),
@@ -380,8 +416,8 @@ class _ResultPageState extends State<ResultPage> {
               Text(''),
               Text(''),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text("    "),
                   RaisedButton(
                     color: Colors.grey[350],
                     child: Text(
@@ -393,8 +429,6 @@ class _ResultPageState extends State<ResultPage> {
                       MaterialPageRoute(builder: (context) => MyHomePage()),
                     ),
                   ),
-                  Text("      "),
-                  Text("      "),
                   RaisedButton(
                     color: Colors.grey[350],
                     child: Text(
@@ -429,6 +463,18 @@ class Chartseries {
     @required this.resultdry,
     @required this.resultwet,
     @required this.litres,
+    this.barColor,
+  });
+}
+
+class CatchChart {
+  final String type;
+  final double value;
+  final charts.Color barColor;
+
+  CatchChart({
+    @required this.type,
+    @required this.value,
     this.barColor,
   });
 }

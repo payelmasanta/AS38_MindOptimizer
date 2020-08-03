@@ -18,7 +18,8 @@ class AboutScreen extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Oswald',
                       fontSize: 23,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2),
                 ),
               ),
               Container(
@@ -40,14 +41,24 @@ class AboutScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Center(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              Text("Hey there.."),
-            ],
+      body: Column(
+        children: <Widget>[
+          Text(""),
+          Text(""),
+          Container(
+            height: 600,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 30, horizontal: 0),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.fill,
+                image: AssetImage(
+                  'assets/images/aboutus.jpg',
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

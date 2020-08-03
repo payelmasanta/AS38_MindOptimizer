@@ -6,7 +6,7 @@ Create a new Flutter project via "flutter create some_project" command in the co
 
 Replace the lib folder and the pubspec.yaml file with the attached files.
 
-Possibly add assets like images or fonts or adjust the AndroidManifest.xml file to add data permissions.
+Possibly add assets like images or fonts and adjust the AndroidManifest.xml and build.gradle files file to add data permissions.
 
 Run the command "flutter packages get" in the studio terminal.
 

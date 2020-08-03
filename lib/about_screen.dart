@@ -7,35 +7,48 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
-        title: Row(
-          //mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-                padding: const EdgeInsets.only(left: 80.0, right: 8.0),
+        title: Container(
+          width: double.infinity,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
                 child: Text(
-                  'About Us',
-                  style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
-                )),
-            Container(
-              margin: EdgeInsets.only(left: 50, right: 0),
-              child: FlatButton(
-                color: Colors.blue[900],
-                child: Image.asset(
-                  'assets/images/logo1.jpeg',
-                  height: 50,
+                  'ABOUT US',
+                  style: TextStyle(
+                      fontFamily: 'Oswald',
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MyHomePage()),
-                  ); 
-                },
               ),
-            ),
-          ],
+              Container(
+                child: FlatButton(
+                  color: Colors.blue[900],
+                  child: Image.asset(
+                    'assets/images/logo1.jpeg',
+                    height: 50,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      body: Container(),
+      body: Center(
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Text("Hey there.."),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

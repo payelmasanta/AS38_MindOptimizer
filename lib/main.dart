@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rwh_assistant/home_page.dart';
+import 'package:rwh_assistant/condition.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,8 +8,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'RWH Assistant',
-      home: MyHomePage(),
+      home: Condition(),
     );
   }
 }
- 

@@ -287,13 +287,14 @@ class SignUpPageState extends State<SignUpPage> {
       ))
               .user;
 
-      await DatabaseService(uid: user.uid).updateUserData('0');
-      await DatabaseServicee(uid: user.uid).updateUserDataa('0');
+      await DatabaseService(uid: user.uid)
+          .updateUserData('0', '0', 'null', 'null');
+      _showToast();
 
       //user.sendEmailVerification(); // display for user that we sent an email
       try {
         await user.sendEmailVerification();
-        _showToast();
+
         Navigator.push(
             context,
             MaterialPageRoute(

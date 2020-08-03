@@ -153,7 +153,7 @@ class MyHomePageState extends State<MyHomePage> {
                           builder: (context) => ConnectVendors(),
                         ));
                   },
-                  color: Colors.blue[100],
+                  color: Colors.blue[200],
                 ),
               ),
               Container(

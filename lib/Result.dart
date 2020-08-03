@@ -251,12 +251,14 @@ class _ResultPageState extends State<ResultPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text(
-                            "The water availability is calculated depending on the \naverage rainfall, run-off coefficient and the roof area.",
-                            style: TextStyle(
-                                color: Colors.grey[900],
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
+                          Flexible(
+                            child: Text(
+                              "The water availability is calculated depending on the average rainfall, run-off coefficient and the roof area.",
+                              style: TextStyle(
+                                  color: Colors.grey[900],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ],
                       ),
@@ -279,7 +281,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     Text(
                       "A $scatch roof has a runoff coefficient of $cval, which means that $cvalper % of the rain can be harvested. Based on this runoff coeeficient and a "
-                      "roof area of $roof square metres a volume of $vol1 of water can be collected in the driest month and $vol2 in the wettest month.",
+                      "roof area of $roof square metres a volume of $vol1 of water can be collected in the driest month and $vol2 in the wettest month. \n\nBelow graph shows the percentage of rainfall that can be collected using different roof-types.",
                       style: TextStyle(fontFamily: 'Open Sans'),
                     ),
                   ],
@@ -315,12 +317,14 @@ class _ResultPageState extends State<ResultPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text(
-                            "The water demand depends on the number of \npeople using the water and average amount of \nwater used by each person.",
-                            style: TextStyle(
-                                color: Colors.grey[900],
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
+                          Flexible(
+                            child: Text(
+                              "The water demand depends on the number of people using the water and average amount of water used by each person.",
+                              style: TextStyle(
+                                  color: Colors.grey[900],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ],
                       ),

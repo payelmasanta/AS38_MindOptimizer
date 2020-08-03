@@ -11,7 +11,7 @@ class _SuggestionsState extends State<Suggestions> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue[900], 
+        backgroundColor: Colors.blue[900],
         title: Stack(
           children: <Widget>[
             Row(
@@ -22,8 +22,11 @@ class _SuggestionsState extends State<Suggestions> {
                   margin: EdgeInsets.only(top: 10),
                   //padding: const EdgeInsets.only(left: 15.0, right: 8.0),
                   child: Text(
-                    'Suggestions',
-                    style: TextStyle(fontFamily: 'Oswald', fontSize: 23),
+                    'SUGGESTIONS',
+                    style: TextStyle(
+                        fontFamily: 'Oswald',
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

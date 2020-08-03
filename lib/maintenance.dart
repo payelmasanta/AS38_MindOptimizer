@@ -15,36 +15,27 @@ class _MaintenanceState extends State<Maintenance> {
         title: Stack(
           children: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  //padding: const EdgeInsets.only(left: 15.0, right: 8.0),
-                  child: Text(
-                    'MAINTENANCE',
-                    style: TextStyle(fontFamily: 'Oswald', fontSize: 23),
-                  ),
+                Text(
+                  'MAINTENANCE',
+                  style: TextStyle(
+                      fontFamily: 'Oswald',
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold),
                 ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Container(
-                  //margin: EdgeInsets.only(left: 25, right: 0),
-                  child: FlatButton(
-                    color: Colors.blue[900],
-                    child: Image.asset(
-                      'assets/images/logo1.jpeg',
-                      height: 50,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MyHomePage()),
-                      );
-                    },
+                FlatButton(
+                  color: Colors.blue[900],
+                  child: Image.asset(
+                    'assets/images/logo1.jpeg',
+                    height: 50,
                   ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                    );
+                  },
                 ),
               ],
             ),

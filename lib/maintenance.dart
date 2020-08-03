@@ -21,7 +21,7 @@ class _MaintenanceState extends State<Maintenance> {
                   margin: EdgeInsets.only(top: 10),
                   //padding: const EdgeInsets.only(left: 15.0, right: 8.0),
                   child: Text(
-                    'Maintenance',
+                    'MAINTENANCE',
                     style: TextStyle(fontFamily: 'Oswald', fontSize: 23),
                   ),
                 ),

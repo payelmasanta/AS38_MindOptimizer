@@ -1,10 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+//import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rwh_assistant/Result.dart';
+import 'package:rwh_assistant/database.dart';
+import './database1.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 import 'home_page.dart';
 
 class Item {
@@ -24,7 +31,7 @@ class CalculationsState extends State<Calculations> {
   bool isData = false;
   String locationMessage = "", place;
   String placeName = '';
-  double demand;
+  double resrain_dry = 7, resrain_wet = 8, demand;
   double result_dry, result_wet;
   int people;
   Item selectedRegion, selectedCatchment;
@@ -38,7 +45,6 @@ class CalculationsState extends State<Calculations> {
     const Item('Brick Pavement'),
   ];
 
-  //GET LOCATION
   Future getCurrentLocation() async {
     bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
     if (isLocationEnabled) {
@@ -60,10 +66,11 @@ class CalculationsState extends State<Calculations> {
     } else {
       showDialog(
           context: context, builder: (BuildContext context) => errorDialog);
-      
+      // AppSettings.openLocationSettings();
     }
   }
- FetchJSON() async {
+
+  FetchJSON() async {
     var Response = await http.get(
       "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/a82a39acd54e00d8c3396f3c4a559c43db96b2d3/kuchbhi.json",
       headers: {"Accept": "application/json"},
@@ -91,38 +98,30 @@ class CalculationsState extends State<Calculations> {
       print('Something went wrong. \nResponse Code : ${Response.statusCode}');
     }
   }
-  
-  
-  
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Stack(
           children: <Widget>[
-            Row(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                    margin: EdgeInsets.only(top: 10),
-                    padding: const EdgeInsets.only(left: 40.0, right: 8.0),
-                    child: Text(
-                      'CALCULATE RAINFALL',
-                      style: TextStyle(
-                          fontFamily: 'Oswald',
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.bold),
-                    )),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Container(
-                  //margin: EdgeInsets.only(left: 83, right: 0),
-                  child: FlatButton(
+            Container(
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Text(
+                    'CALCULATE RAINFALL',
+                    style: TextStyle(
+                      fontFamily: 'Oswald',
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  FlatButton(
                     color: Colors.blue[900],
                     child: Image.asset(
                       'assets/images/logo1.jpeg',
@@ -135,8 +134,8 @@ class CalculationsState extends State<Calculations> {
                       );
                     },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -179,7 +178,7 @@ class CalculationsState extends State<Calculations> {
                   Text(""),
                   Text(''),
                   Container(
-                    width: 300,
+                    width: width * 0.8,
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: Form(
                       key: _formKey,
@@ -258,9 +257,12 @@ class CalculationsState extends State<Calculations> {
                     ),
                   ),
                   // catchment start
-                  Text(
-                      "The minimum water demand according to the World Health Organization (WHO) is "
-                      "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day."),
+                  Container(
+                    width: width * 0.8,
+                    child: Text(
+                        "The minimum water demand according to the World Health Organization (WHO) is "
+                        "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day."),
+                  ),
                   Text(""),
                   Text(''),
                   Text(''),
@@ -318,6 +320,7 @@ class CalculationsState extends State<Calculations> {
                   //catchment end
                   Text(""),
                   Container(
+                    width: width * 1,
                     padding: EdgeInsets.only(right: 20, bottom: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -384,30 +387,48 @@ class CalculationsState extends State<Calculations> {
   );
 
   void submitit(double roofsize, catvalue, resrd, resrw) async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    final String usr = user.uid.toString();
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       result_dry = (roofsize * catvalue) * resrd;
       result_wet = (roofsize * catvalue) * resrw;
       print(result_dry);
       print(result_wet);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultPage(
-              result_dry.toString(),
-              result_wet.toString(),
-              demand,
-              people,
-              mondry,
-              monwet,
-              selectedCatchment.name.toString(),
-              raindry,
-              rainwet,
-              roofsize,
-              catchValue),
-        ),
-      );
     }
+
+    DatabaseService(uid: usr).updateUserData(result_dry.toString(),
+        result_wet.toString(), locationMessage, placeName);
+    getData();
   }
-} 
+
+  Future<void> getData() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    var resul = await Firestore.instance
+        .collection("result_dry")
+        .document(firebaseUser.uid)
+        .get();
+
+    var resul1 = await Firestore.instance
+        .collection("result_wet")
+        .document(firebaseUser.uid)
+        .get();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+            result_dry.toString(),
+            result_wet.toString(),
+            demand,
+            people,
+            mondry,
+            monwet,
+            selectedCatchment.name.toString(),
+            raindry,
+            rainwet,
+            roofsize,
+            catchValue),
+      ),
+    );
+  }
+}

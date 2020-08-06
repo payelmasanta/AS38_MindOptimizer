@@ -7,23 +7,28 @@ class Condition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     doo(context);
-    return MyHomePage();
+    return Container(
+      width: 0,
+      height: 0,
+    );
   }
 
   doo(context) async {
     FirebaseUser uss = await FirebaseAuth.instance.currentUser();
     if (uss == null) {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoginPage(),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ),
+      );
     } else {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyHomePage(),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyHomePage(),
+        ),
+      );
     }
   }
 }

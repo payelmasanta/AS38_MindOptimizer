@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './forgot_pass.dart';
+import './authStatus.dart';
+import './error_handling.dart';
 //import 'package:firebase_core/firebase_core.dart';
 import './signup_page.dart';
 import 'dart:async';
@@ -131,13 +133,13 @@ class LoginPageState extends State<LoginPage> {
                                         hintStyle: kHintTextStyle,
                                       ),
                                     ),
+                                    Text(""),
                                     FlatButton(
                                       onPressed: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => ForgotPass(),
                                           )),
-                                      padding: EdgeInsets.only(right: 0),
                                       child: Text(
                                         'Forgot Password?',
                                         style: TextStyle(
@@ -233,10 +235,18 @@ class LoginPageState extends State<LoginPage> {
       setState(() {
         loading = true;
       });
+
+      AuthResultStatus _status;
       try {
         FirebaseUser user = (await FirebaseAuth.instance
                 .signInWithEmailAndPassword(email: email, password: password))
             .user;
+
+        if (user != null) {
+          _status = AuthResultStatus.successful;
+        } else {
+          _status = AuthResultStatus.undefined;
+        }
 
         if (user.isEmailVerified) {
           Navigator.push(
@@ -247,14 +257,49 @@ class LoginPageState extends State<LoginPage> {
 
           return user.uid;
         } else {
-          setState(() {
-            ErrorHint('Could not sign in with these credentials');
-            loading = false;
-          });
+          String errorMsg = "This email is not verified.";
+          _showAlertDialog(errorMsg);
+        }
+
+        if (_status == AuthResultStatus.successful) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(),
+              ));
+        } else {
+          final errorMsg =
+              AuthExceptionHandler.generateExceptionMessage(_status);
+          _showAlertDialog(errorMsg);
         }
       } catch (e) {
-        print(e.message);
+        _status = AuthExceptionHandler.handleException(e);
+        final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
+        _showAlertDialog(errorMsg);
       }
     }
+  }
+
+  _showAlertDialog(errorMsg) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'SignIn Failed',
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Text(errorMsg),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Okay"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

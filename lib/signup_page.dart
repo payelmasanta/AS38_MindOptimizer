@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import './error_handling.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:rwh_assistant/database.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
+import './authStatus.dart';
 import './login_page.dart';
-import 'http_exception.dart';
 import './loading.dart';
-import './database1.dart';
 
 final kHintTextStyle = TextStyle(
   color: Colors.white70,
@@ -106,25 +104,6 @@ class SignUpPageState extends State<SignUpPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    TextFormField(
-                                      style: TextStyle(color: Colors.white),
-                                      validator: (input) {
-                                        if (input.isEmpty) {
-                                          return 'Username can not be blank';
-                                        }
-                                      },
-                                      onSaved: (input) => username = input,
-                                      cursorColor: Colors.white,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        contentPadding:
-                                            EdgeInsets.only(top: 13),
-                                        prefixIcon: Icon(Icons.account_circle,
-                                            color: Colors.white),
-                                        hintText: 'Enter your name',
-                                        hintStyle: kHintTextStyle,
-                                      ),
-                                    ),
                                     Text(""),
                                     TextFormField(
                                       cursorColor: Colors.white,
@@ -243,12 +222,14 @@ class SignUpPageState extends State<SignUpPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 20,
+            height: 30,
             width: 30.0,
           ),
-          Text(
-            "Verification email has been sent.\nPlease check your email.",
-            style: TextStyle(color: Colors.white),
+          Flexible(
+            child: Text(
+              "Verification link has been sent. Please check your email. The link will expire quickly. please do the verification immediately",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -276,45 +257,70 @@ class SignUpPageState extends State<SignUpPage> {
     if (formState.validate()) {
       formState.save();
 
-      setState(() {
-        loading = true;
-      });
+      AuthResultStatus _status;
 
-      FirebaseUser user =
-          (await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      ))
-              .user;
-
-      await DatabaseService(uid: user.uid)
-          .updateUserData('0', '0', 'null', 'null');
-      _showToast();
-
-      //user.sendEmailVerification(); // display for user that we sent an email
       try {
-        await user.sendEmailVerification();
+        FirebaseUser user =
+            (await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        ))
+                .user;
 
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LoginPage(),
-            ));
-
-        return user.uid;
-      } on HttpException catch (error) {
-        print(error.toString());
-        var errorMessage = 'Authentication failed';
-        if (error.toString().contains('EMAIL_EXISTS')) {
-          errorMessage = 'This email address is already in use.';
+        if (user != null) {
+          _status = AuthResultStatus.successful;
+        } else {
+          _status = AuthResultStatus.undefined;
         }
-        _showErrorDialog(errorMessage);
-      } catch (e) {
-        print(e.toString());
-        const errorMessage =
-            'Could not authenticate you. Please try again later.';
-        _showErrorDialog(errorMessage);
+
+        if (_status == AuthResultStatus.successful) {
+          setState(() {
+            loading = true;
+          });
+          _showToast();
+
+          await user.sendEmailVerification();
+          await FirebaseAuth.instance.signOut();
+
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginPage(),
+              ));
+        } else {
+          final errorMsg =
+              AuthExceptionHandler.generateExceptionMessage(_status);
+          _showAlertDialog(errorMsg);
+        }
+      } catch (error) {
+        _status = AuthExceptionHandler.handleException(error);
+        final errorMsg = AuthExceptionHandler.generateExceptionMessage(_status);
+        _showAlertDialog(errorMsg);
       }
+      return _status;
     }
+  }
+
+  _showAlertDialog(errorMsg) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'SignUp Failed',
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Text(errorMsg),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Okay"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
